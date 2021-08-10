@@ -42,7 +42,7 @@ plugins.withType<MavenPublishPlugin> {
     plugins.withType<KotlinMultiplatformPluginWrapper> {
         apply(plugin = "org.jetbrains.dokka")
 
-        val dokkaJavadoc by tasks.existing(DokkaTask::class) {
+        val dokkaHtml by tasks.existing(DokkaTask::class) {
             outputDirectory.set(File("$buildDir/docs/javadoc"))
         }
 
@@ -50,8 +50,8 @@ plugins.withType<MavenPublishPlugin> {
             group = LifecycleBasePlugin.BUILD_GROUP
             description = "Assembles a jar archive containing the Javadoc API documentation."
             archiveClassifier.set("javadoc")
-            dependsOn(dokkaJavadoc)
-            from(dokkaJavadoc.get().outputDirectory)
+            dependsOn(dokkaHtml)
+            from(dokkaHtml.get().outputDirectory)
         }
 
         configure<KotlinMultiplatformExtension> {
@@ -95,7 +95,7 @@ plugins.withType<MavenPublishPlugin> {
         publications.withType<MavenPublication> {
             pom {
                 name.set(project.name)
-                url.set("https://github.com/michaelbull/kotlin-result")
+                url.set("https://github.com/jason5lee/resukt")
                 inceptionYear.set("2021")
 
                 licenses {
