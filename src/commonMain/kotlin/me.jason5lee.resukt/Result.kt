@@ -1,4 +1,4 @@
-@file:Suppress("UNCHECKED_CAST")
+@file:Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 
 package me.jason5lee.resukt
 
@@ -162,16 +162,17 @@ public inline fun <R, T : R, F: Any> Result<T, F>.getOrElse(onFailure: (failure:
  * Returns the encapsulated value if this instance represents [success][Result.isSuccess] or the
  * result of [onFailure] function for this instance as type `Result<T, Nothing>` if it is [failure][Result.isFailure].
  *
- * A common use of this function is `result.getOrLet { return it }` which gets the successful value
- * or returns current failure result if it is. If you know Rust, this is similar to `?` in Rust.
+ * A common use of this function is `result.whenFailure { return it }` which gets the successful value
+ * or returns current failure result. If you know Rust, `.whenFailure { return it }` has a similar effect to `?` in Rust.
  */
-public inline fun <R, T : R, F: Any> Result<T, F>.getOrLet(onFailure: (result: Result<Nothing, F>) -> R): R {
+public inline fun <R, T : R, F: Any> Result<T, F>.whenFailure(onFailure: (result: Result<Nothing, F>) -> R): R {
 //    contract {
 //        callsInPlace(onFailure, InvocationKind.AT_MOST_ONCE)
 //    }
-    return when (val failure = failureOrNull()) {
-        null -> value as T
-        else -> onFailure(Result.failure(failure))
+    return if (isSuccess) {
+        value as T
+    } else {
+        onFailure(this as Result<Nothing, F>)
     }
 }
 
@@ -191,13 +192,13 @@ public inline fun <R, T : R> Result<T, *>.getOrDefault(defaultValue: R): R {
  * if this instance represents [failure][Result.isFailure] or the
  * original encapsulated value if it is [success][Result.isSuccess].
  */
-public inline fun <R, T : R, F: Any> Result<T, F>.recover(transform: (exception: F) -> R): Result<R, F> {
+public inline fun <R, T : R, F: Any> Result<T, F>.recover(transform: (failure: F) -> R): Result<R, F> {
 //    contract {
 //        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
 //    }
-    return when (val exception = failureOrNull()) {
+    return when (val failure = failureOrNull()) {
         null -> this
-        else -> Result.success(transform(exception))
+        else -> Result.success(transform(failure))
     }
 }
 

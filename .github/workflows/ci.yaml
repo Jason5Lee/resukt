@@ -3,43 +3,43 @@ name: ci
 on: [ push, pull_request ]
 
 jobs:
-#  check:
-#    runs-on: ${{ matrix.os }}
-#
-#    strategy:
-#      matrix:
-#        os: [ ubuntu-latest, macos-latest, windows-latest ]
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#      - uses: actions/cache@v1
-#        with:
-#          path: ~/.gradle/wrapper
-#          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.*') }}
-#          restore-keys: |
-#            ${{ runner.os }}-gradle-wrapper-
-#      - uses: actions/cache@v1
-#        with:
-#          path: ~/.gradle/caches
-#          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('buildSrc/src/main/kotlin/Versions.kt') }}
-#          restore-keys: |
-#            ${{ runner.os }}-gradle-caches-
-#      - uses: actions/setup-java@v1
-#        with:
-#          java-version: 1.8
-#
-#      - run: ./gradlew linuxX64Test
-#        if: matrix.os == 'ubuntu-latest'
-#
-#      - run: ./gradlew mingwX64Test
-#        if: matrix.os == 'windows-latest'
-#
-#      - run: ./gradlew check
-#        if: matrix.os == 'macos-latest'
+  check:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-wrapper-
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('buildSrc/src/main/kotlin/Versions.kt') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-caches-
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - run: CI_MP=1 ./gradlew linuxX64Test
+        if: matrix.os == 'ubuntu-latest'
+
+      - run: CI_MP=1 ./gradlew mingwX64Test
+        if: matrix.os == 'windows-latest'
+
+      - run: CI_MP=1 ./gradlew check
+        if: matrix.os == 'macos-latest'
 
   publish:
-#    needs: check
+    needs: check
     if: github.ref == 'refs/heads/main' && github.event_name == 'push' # && needs.check.result == 'success'
     runs-on: ${{ matrix.os }}
 
@@ -73,14 +73,14 @@ jobs:
         with:
           java-version: 1.8
 
-      - run: ./gradlew publishLinuxX64PublicationToMavenRepository --info --stacktrace
+      - run: CI_MP=1 ./gradlew publishLinuxX64PublicationToMavenRepository --info --stacktrace
         if: matrix.os == 'ubuntu-latest'
 
-      - run: ./gradlew publishLinuxArm64PublicationToMavenRepository
+      - run: CI_MP=1 ./gradlew publishLinuxArm64PublicationToMavenRepository
         if: matrix.os == 'ubuntu-latest'
 
-      - run: ./gradlew publishMingwX64PublicationToMavenRepository
+      - run: CI_MP=1 ./gradlew publishMingwX64PublicationToMavenRepository
         if: matrix.os == 'windows-latest'
 
-      - run: ./gradlew publish
+      - run: CI_MP=1 ./gradlew publish
         if: matrix.os == 'macos-latest'

@@ -22,7 +22,7 @@ plugins {
 }
 
 group = "me.jason5lee"
-version = "1.0-SNAPSHOT"
+version = "1.0.0"
 
 tasks.withType<DependencyUpdatesTask> {
     rejectVersionIf {
@@ -42,16 +42,13 @@ plugins.withType<MavenPublishPlugin> {
     plugins.withType<KotlinMultiplatformPluginWrapper> {
         apply(plugin = "org.jetbrains.dokka")
 
-        val dokkaHtml by tasks.existing(DokkaTask::class) {
-            outputDirectory.set(File("$buildDir/docs/javadoc"))
-        }
+        val dokkaHtml by tasks.existing(DokkaTask::class)
 
         val javadocJar by tasks.registering(Jar::class) {
             group = LifecycleBasePlugin.BUILD_GROUP
             description = "Assembles a jar archive containing the Javadoc API documentation."
             archiveClassifier.set("javadoc")
-            dependsOn(dokkaHtml)
-            from(dokkaHtml.get().outputDirectory)
+            from(dokkaHtml)
         }
 
         configure<KotlinMultiplatformExtension> {
@@ -62,17 +59,18 @@ plugins.withType<MavenPublishPlugin> {
                     artifact(javadocJar.get())
                 }
             }
+            if (!System.getenv("CI_MP").isNullOrEmpty()) {
+                js(BOTH) {
+                    browser()
+                    nodejs()
+                }
 
-            js(BOTH) {
-                browser()
-                nodejs()
+                ios()
+                linuxX64()
+                mingwX64()
+                macosX64()
+                linuxArm64()
             }
-
-            ios()
-            linuxX64()
-            mingwX64()
-            macosX64()
-            linuxArm64()
         }
     }
 
@@ -156,14 +154,16 @@ kotlin {
         }
         val jvmMain by getting
         val jvmTest by getting
-        val jsMain by getting
-        val jsTest by getting
-        val linuxX64Main by getting
-        val mingwX64Main by getting
-        val macosX64Main by getting
-        val iosX64Main by getting
-        val iosArm64Main by getting
 
+        if (!System.getenv("CI_MP").isNullOrEmpty()) {
+            val jsMain by getting
+            val jsTest by getting
+            val linuxX64Main by getting
+            val mingwX64Main by getting
+            val macosX64Main by getting
+            val iosX64Main by getting
+            val iosArm64Main by getting
+        }
     }
 }
 
