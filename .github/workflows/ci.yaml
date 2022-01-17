@@ -76,16 +76,14 @@ jobs:
         with:
           java-version: 1.8
 
-      - run: CI_MP=1 ./gradlew publishLinuxX64PublicationToMavenRepository --info --stacktrace
+      - run: ./gradlew publishLinuxX64PublicationToMavenRepository --info --stacktrace
         if: matrix.os == 'ubuntu-latest'
 
-      - run: CI_MP=1 ./gradlew publishLinuxArm64PublicationToMavenRepository
+      - run: ./gradlew publishLinuxArm64PublicationToMavenRepository
         if: matrix.os == 'ubuntu-latest'
 
-      - run: |
-          SET CI_MP=1 
-          ./gradlew publishMingwX64PublicationToMavenRepository
+      - run: ./gradlew publishMingwX64PublicationToMavenRepository
         if: matrix.os == 'windows-latest'
 
-      - run: CI_MP=1 ./gradlew publish
+      - run: ./gradlew publish
         if: matrix.os == 'macos-11'

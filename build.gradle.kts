@@ -96,6 +96,7 @@ plugins.withType<MavenPublishPlugin> {
                 url.set("https://github.com/jason5lee/resukt")
                 inceptionYear.set("2021")
 
+                description.set(project.description)
                 licenses {
                     license {
                         name.set("ISC License")
@@ -121,10 +122,10 @@ plugins.withType<MavenPublishPlugin> {
                     url.set("https://github.com/Jason5Lee/resukt")
                 }
 
-//                ciManagement {
-//                    system.set("GitHub")
-//                    url.set("https://github.com/Jason5Lee/resukt/actions?query=workflow%3Aci")
-//                }
+                ciManagement {
+                    system.set("GitHub")
+                    url.set("https://github.com/Jason5Lee/resukt/actions?query=workflow%3Aci")
+                }
             }
         }
 
